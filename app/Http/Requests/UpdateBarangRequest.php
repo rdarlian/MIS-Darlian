@@ -31,7 +31,7 @@ class UpdateBarangRequest extends FormRequest
             'kode_barang' => ['required', Rule::unique('barangs', 'kode_barang')->ignore($barang)],
             'stok' => 'required|integer',
             'harga' => 'required|integer',
-            'user' => 'required|integer|exists:users,username',
+            'user' => 'required|exists:users,username',
         ];
     }
 }
