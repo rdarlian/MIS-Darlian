@@ -28,7 +28,7 @@ class UpdateBarangRequest extends FormRequest
         $barang = Barang::find($request->id);
         return [
             'nama_barang' => 'required|string|max:255',
-            'kode_barang' => ['required', Rule::unique('coadebits', 'kode')->ignore($barang)],
+            'kode_barang' => ['required', Rule::unique('barangs', 'kode_barang')->ignore($barang)],
             'stok' => 'required|integer',
             'harga' => 'required|integer',
             'user' => 'required|integer|exists:users,username',
