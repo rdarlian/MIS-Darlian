@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\BarangController;
+use App\Models\Barang;
+use Yajra\DataTables\DataTables;
 
 /*
 |--------------------------------------------------------------------------

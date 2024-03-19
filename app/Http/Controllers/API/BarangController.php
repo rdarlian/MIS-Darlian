@@ -15,13 +15,13 @@ class BarangController extends Controller
 {
     public function fetch(Request $request)
     {
+        $draw = $request->input('draw');
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+        $search = $request->input('search');
+        $order = $request->input('order', []);
         $id = $request->input('id');
-        $kode_barang = $request->input('kode_barang');
-        $nama_barang = $request->input('nama_barang');
-        $limit = $request->input('limit', 100);
-        $user = $request->input('user');
 
-        //get single data
         if ($id) {
             $barang = Barang::find($id);
 
@@ -30,21 +30,37 @@ class BarangController extends Controller
             }
             return ResponseFormatter::error('barang not found');
         }
-        //get multiple data
-        $barangs = DB::table('barangs');
-        // $barangs = Barang::query()->where('user', $request->user);
 
-        if ($nama_barang) {
-            $barangs->where('nama_barang', 'like', '%' . $nama_barang . '%');
-        }
-        if ($kode_barang) {
-            $barangs->where('kode$kode_barang', 'like', '%' . $kode_barang . '%');
-        }
-        if ($id) {
-            $barangs->where('id', 'like', '%' . $id . '%');
-        }
+        // Base query
+        $query = Barang::query();
 
-        return ResponseFormatter::success($barangs->orderBy('nama_barang', 'asc')->paginate($limit), 'barang Found');
+        // Filtering
+        if (!empty($search)) {
+            $query->where('nama_barang', 'ilike', '%' . $search . '%');
+        }
+        if (!empty($order)) {
+
+            $manualColumn = ["id", "nama_barang", "kode_barang", "stok", "harga", "user"];
+            $query->orderBy($manualColumn[$order[0]['column']], $order[0]['dir']);
+        }
+        // Paginate the query
+        $users = $query->offset($start)
+            ->limit($length)
+            ->get();
+        // Total records without filtering
+        $totalRecords = Barang::count();
+
+
+        // Total records after filtering
+        $filteredRecords = $query->count();
+
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $filteredRecords,
+            'data' => $users,
+        ]);
     }
 
     public function create(CreateBarangRequest $request)
